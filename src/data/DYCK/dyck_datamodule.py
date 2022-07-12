@@ -45,8 +45,10 @@ class DYCK_Dataset(Dataset):
             word_length = self.word_length
         
         is_dyck = np.random.randint(2)
+        
         if is_dyck:
             word = np.random.choice(self.dyck[word_length])
+            word = [int(x) for x in word]
         else: 
             word = np.random.randint(2, size=(int(2*word_length)))
             is_dyck = word in self.dyck[word_length]
