@@ -51,7 +51,7 @@ class DYCK_Dataset(Dataset):
             word = [int(x) for x in word]
         else: 
             word = np.random.randint(2, size=(int(2*word_length)))
-            is_dyck = word in self.dyck[word_length]
+            is_dyck = ("".join(str(x) for x in word)) in self.dyck[word_length] #sanity check
 
         return torch.tensor(word), is_dyck
 
