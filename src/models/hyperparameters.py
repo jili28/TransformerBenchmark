@@ -32,6 +32,11 @@ params = {
         'position_embedding': 'sine',
         'num_queries': 1,
         'maxpools': [6, 4, 4, 2],
+        #data
+        'word_length':256,
+        'len':10000,
+        'leq':True,
+        'batch_size':64
 
     },
 
