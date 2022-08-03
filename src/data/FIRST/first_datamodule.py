@@ -20,7 +20,8 @@ class FIRST_Dataset(Dataset):
     while theoretically an iterable dataset, abusing Dataset API
     works out to smoother implementation
     """
-    def __init__(self, word_length, len, leq = True):
+
+    def __init__(self, word_length, len, leq=False):
         super(FIRST_Dataset, self).__init__()
         assert word_length > 0
         self.word_length = word_length
@@ -38,6 +39,7 @@ class FIRST_Dataset(Dataset):
         word = np.random.randint(2, size=(int(word_length)))
         return torch.tensor(word), (word[0] == 1)
 
+
 class FIRST_DataModule(pl.LightningDataModule):
     def __init__(self, word_length, leq, len, batch_size=32, collate_fn=None):
         super().__init__()
@@ -47,7 +49,6 @@ class FIRST_DataModule(pl.LightningDataModule):
         self.word_length = word_length
         self.leq = leq
         self.len = len
-
 
     def prepare_data(self):
         pass
@@ -66,7 +67,7 @@ class FIRST_DataModule(pl.LightningDataModule):
 
         # Assign train/val datasets for use in dataloaders
         if stage == "fit" or stage is None:
-            self.train_set = FIRST_Dataset(word_length=self.word_length, len=self.len, leq=True)
+            self.train_set = FIRST_Dataset(word_length=self.word_length, len=self.len, leq=False)
             self.val_set = FIRST_Dataset(word_length=self.word_length, len=self.len, leq=False)
 
         if stage == "test" or stage is None:

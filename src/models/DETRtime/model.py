@@ -25,43 +25,49 @@ class Acceptor(pl.LightningModule):
         super().__init__()
         self.num_queries = num_queries
         hidden_dim = transformer.d_model
-
-        self.final = MLP(hidden_dim, hidden_dim, 1, 2)
+        self.final = MLP(hidden_dim, hidden_dim, 2, 2)
 
         self.query_embed = nn.Embedding(num_queries, hidden_dim)
         # CNN --> Transformer projector
         self.input_proj = nn.Conv1d(backbone.num_channels, hidden_dim, 1)
         self.backbone = backbone
-        self.backbone = backbone
+        self.transformer = transformer
+        self.loss = nn.CrossEntropyLoss()
 
     def forward(self, x: torch.Tensor):
         """ The forward expects a NestedTensor, which consists of:
                - x.tensor: batched images, of shape [batch_size x S]
         """
         src, pos = self.backbone(x)
+        src = src.unsqueeze(1).float()
+        src = self.input_proj(src)
         # no attention mask needed
         # assert mask is not None
         mask = None
-        hs = self.transformer(self.input_proj(src), mask, self.query_embed.weight, pos)[0]
+        hs = self.transformer(src, mask, self.query_embed.weight, pos)[0]
         #bs, num_queries, hidden
-        out = self.final(hs)
+        out = self.final(hs[-1])
         #possibly reshape?
         return out
 
     def training_step(self, batch, batch_idx):
         x, y = batch
-        outputs = self.forward(x)
+        y_pred = self.forward(x)
+
+        y_pred = y_pred.squeeze()
         # run through criterion
-        loss = self.loss(outputs, y)
+        loss = self.loss(y_pred, y.long())
         self.log("Training Loss", loss)
 
     def validation_step(self, batch, barch_idx):
         x, y = batch
         y_pred = self.forward(x)
+
+        y_pred = y_pred.squeeze()
         # run through criterion
-        loss = self.loss(y_pred, y)
+        loss = self.loss(y_pred, y.long())
         self.log("Validation Loss", loss)
-        return (np.array(y).flatten(), np.array(y_pred).flatten())
+        return (np.array(y.cpu()).flatten(), np.array(torch.argmax(y_pred.cpu(), dim=1)).flatten())
 
     def validation_epoch_end(self, outputs) -> None:
         """
@@ -83,10 +89,12 @@ class Acceptor(pl.LightningModule):
     def test_step(self, batch, barch_idx):
         x, y = batch
         y_pred = self.forward(x)
+        y_pred = y_pred.squeeze()
         # run through criterion
-        loss = self.loss(y_pred, y)
+        loss = self.loss(y_pred, y.long())
         self.log("Test Loss", loss)
-        return (np.array(y).flatten(), np.array(y_pred).flatten())
+        return (np.array(y.cpu()).flatten(), np.array(torch.argmax(y_pred.cpu(), dim=1)).flatten())
+
 
     def test_epoch_end(self, outputs) -> None:
         """
@@ -135,7 +143,7 @@ def build(args):
     transformer = build_transformer(args)
 
     model = Acceptor(
-        backbone,
-        transformer,
+        backbone=backbone,
+        transformer=transformer,
     )
     return model

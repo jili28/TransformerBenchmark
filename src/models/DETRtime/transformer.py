@@ -124,9 +124,9 @@ class TransformerDecoder(nn.Module):
                 intermediate.pop()
                 intermediate.append(output)
 
+
         if self.return_intermediate:
             return torch.stack(intermediate)
-
         return output.unsqueeze(0)
 
 
@@ -288,7 +288,7 @@ def build_transformer(args):
         num_encoder_layers=args["enc_layers"],
         num_decoder_layers=args["dec_layers"],
         normalize_before=args["pre_norm"],
-        return_intermediate_dec=True,
+        return_intermediate_dec=False, #
     )
 
 

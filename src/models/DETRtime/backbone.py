@@ -49,6 +49,9 @@ def build_backbone(args):
         from .backbones.UNet import UNet
         model_class = UNet
         logging.info('[INFO] Using UNet backbone')
+    elif args['backbone'] in ['None']:
+        from .backbones.ID import ID
+        model_class = ID
     else:
         raise NotImplementedError("Choose a valid backbone model")
 
