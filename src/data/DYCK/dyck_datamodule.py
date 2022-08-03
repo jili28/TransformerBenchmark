@@ -14,12 +14,6 @@ def collate_tuples(batch):
     # print(batch[0].size())
     return tuple(batch)
 
-def dyck(n, memo={0: ['']}):
-        if n not in memo:
-            memo[n] = ['0%s1%s' % t for i in range(1, n + 1)
-                for t in product(dyck(i - 1, memo), dyck(n - i, memo))]
-        return memo[n]
-
 
 class DYCK_Dataset(Dataset):
     """
@@ -32,8 +26,7 @@ class DYCK_Dataset(Dataset):
         self.word_length = word_length
         self.leq = leq
         self.len = len
-        self.dyck = {0: ['']}
-        dyck(word_length, self.dyck)
+        self.dyck = np.load('dyck_512.npy',allow_pickle='TRUE').item()
 
     def __len__(self):
         return self.len
