@@ -32,12 +32,17 @@ class FIRST_Dataset(Dataset):
         return self.len
 
     def __getitem__(self, idx):
+        mask = torch.zeros((int(self.word_length)))
         if self.leq:
             word_length = np.random.randint(1, self.word_length)
-        else:
-            word_length = self.word_length
-        word = np.random.randint(2, size=(int(word_length)))
-        return torch.tensor(word), (word[0] == 1)
+            mask[word_length:] = 1
+        # else:
+        #     word_length = self.word_length
+
+        word = np.random.randint(2, size=(int(self.word_length)))
+
+
+        return torch.tensor(word), mask, (word[0] == 1)
 
 
 class FIRST_DataModule(pl.LightningDataModule):

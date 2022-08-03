@@ -34,7 +34,7 @@ class Acceptor(pl.LightningModule):
         self.transformer = transformer
         self.loss = nn.CrossEntropyLoss()
 
-    def forward(self, x: torch.Tensor):
+    def forward(self, x: torch.Tensor, mask: torch.Tensor):
         """ The forward expects a NestedTensor, which consists of:
                - x.tensor: batched images, of shape [batch_size x S]
         """
@@ -43,7 +43,8 @@ class Acceptor(pl.LightningModule):
         src = self.input_proj(src)
         # no attention mask needed
         # assert mask is not None
-        mask = None
+
+        assert mask is not None
         hs = self.transformer(src, mask, self.query_embed.weight, pos)[0]
         #bs, num_queries, hidden
         out = self.final(hs[-1])
@@ -51,8 +52,8 @@ class Acceptor(pl.LightningModule):
         return out
 
     def training_step(self, batch, batch_idx):
-        x, y = batch
-        y_pred = self.forward(x)
+        x, mask, y = batch
+        y_pred = self.forward(x, mask)
 
         y_pred = y_pred.squeeze()
         # run through criterion
@@ -60,8 +61,8 @@ class Acceptor(pl.LightningModule):
         self.log("Training Loss", loss)
 
     def validation_step(self, batch, barch_idx):
-        x, y = batch
-        y_pred = self.forward(x)
+        x, mask, y = batch
+        y_pred = self.forward(x, mask)
 
         y_pred = y_pred.squeeze()
         # run through criterion
