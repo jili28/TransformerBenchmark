@@ -32,6 +32,7 @@ class Acceptor(pl.LightningModule):
         self.input_proj = nn.Conv1d(backbone.num_channels, hidden_dim, 1)
         self.backbone = backbone
         self.transformer = transformer
+        self.sigmoid = nn.Sigmoid()
         self.loss = nn.CrossEntropyLoss()
 
     def forward(self, x: torch.Tensor, mask: torch.Tensor):
@@ -48,17 +49,20 @@ class Acceptor(pl.LightningModule):
         hs = self.transformer(src, mask, self.query_embed.weight, pos)[0]
         #bs, num_queries, hidden
         out = self.final(hs[-1])
+        out = self.sigmoid(out)
         #possibly reshape?
         return out
 
     def training_step(self, batch, batch_idx):
         x, mask, y = batch
         y_pred = self.forward(x, mask)
-
+        #print(y_pred.size())
         y_pred = y_pred.squeeze()
         # run through criterion
         loss = self.loss(y_pred, y.long())
         self.log("Training Loss", loss)
+        return loss
+
 
     def validation_step(self, batch, barch_idx):
         x, mask, y = batch
@@ -86,10 +90,12 @@ class Acceptor(pl.LightningModule):
             else:
                 self.log(f'{i}', log_object)
         logging.info(f'classification_report:\n {report}')
+        print(f'classification_report:\n {report}')
 
     def test_step(self, batch, barch_idx):
-        x, y = batch
-        y_pred = self.forward(x)
+        x, mask, y = batch
+        y_pred = self.forward(x, mask)
+
         y_pred = y_pred.squeeze()
         # run through criterion
         loss = self.loss(y_pred, y.long())
@@ -113,6 +119,7 @@ class Acceptor(pl.LightningModule):
             else:
                 self.log(f'{i}', log_object)
         logging.info(f'Test classification_report:\n  {report}')
+        print(f'Test classification_report:\n  {report}')
         for i in report.keys():
             logging.info(f"{i}: {report[i]}")
 

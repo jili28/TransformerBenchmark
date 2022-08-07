@@ -24,8 +24,8 @@ config['dataset'] = 'first'  # options: sleep-edf-153, ...
 Model related settings 
 Available models: Acceptor
 """
-config['model'] = 'Acceptor'
-
+#config['model'] = 'Acceptor'
+config['model'] = 'Encoder'
 """
 Training related settings
 """

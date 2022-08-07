@@ -82,13 +82,13 @@ class FIRST_DataModule(pl.LightningDataModule):
             self.predict_set = NotImplemented
 
     def train_dataloader(self):
-        return DataLoader(self.train_set, batch_size=self.batch_size, collate_fn=self.collate_fn, shuffle=True)
+        return DataLoader(self.train_set, batch_size=self.batch_size, collate_fn=self.collate_fn, shuffle=True, num_workers=5)
 
     def val_dataloader(self):
-        return DataLoader(self.val_set, batch_size=self.batch_size, collate_fn=self.collate_fn, shuffle=True)
+        return DataLoader(self.val_set, batch_size=self.batch_size, collate_fn=self.collate_fn, shuffle=False, num_workers=3)
 
     def test_dataloader(self):
-        return DataLoader(self.test_set, batch_size=self.batch_size, collate_fn=self.collate_fn, shuffle=True)
+        return DataLoader(self.test_set, batch_size=self.batch_size, collate_fn=self.collate_fn, shuffle=False, num_workers=3)
 
     def predict_dataloader(self):
         raise NotImplementedError("We do not have a predict set in this datamodule")

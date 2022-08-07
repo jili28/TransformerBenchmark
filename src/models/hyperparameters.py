@@ -8,7 +8,6 @@ params = {
 
     'Acceptor': {
         'lr': 1e-4,
-        'batch_size': 16,
         'epochs': 200,
         #backbone
         'backbone': 'None',
@@ -33,11 +32,27 @@ params = {
         'num_queries': 1,
         'maxpools': [6, 4, 4, 2],
         #data
-        'word_length':256,
+        'word_length':512,
         'len':10000,
         'leq':True,
         'batch_size':64
 
     },
+    'Encoder': {
+        'lr': 1e-4,
+        'epochs': 200,
+        #model
+        'layers' : 2,
+        'heads' : 1,
+        'd_model': 16,
+        'd_ffnn': 64,
+        'scaled': True,
+        'eps': 1e-5,
+        #data
+        'word_length':512,
+        'len':10000,
+        'leq':True,
+        'batch_size':64
 
+    },
 }
