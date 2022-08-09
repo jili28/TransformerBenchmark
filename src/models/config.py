@@ -7,10 +7,10 @@ config = dict()
 """
 Select which model to run 
 
-Available models: DETRtime, ... 
+Available models: TransformerEncoder, ... 
 Available modes: 'train', 'test', 'inference' 
 """
-config['model'] = 'DETRtime'
+config['model'] = 'TransformerEncoder'
 config['mode'] = 'train'
 
 

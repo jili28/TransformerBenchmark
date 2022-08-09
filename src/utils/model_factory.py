@@ -1,7 +1,7 @@
 """
 Return a model class based on the given string
 """
-from src.models.DETRtime.model import build
+from src.models.TransformerEncoder.model import build
 from src.models.SigmoidEncoder.model import build_encoder
 
 def get_model(args, model_name: str = 'Acceptor'):

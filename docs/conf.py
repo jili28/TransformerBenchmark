@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# DETRtime documentation build configuration file, created by
+# TransformerEncoder documentation build configuration file, created by
 # sphinx-quickstart.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -41,7 +41,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'DETRtime'
+project = u'TransformerEncoder'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -184,8 +184,8 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
     ('index',
-     'DETRtime.tex',
-     u'DETRtime Documentation',
+     'TransformerEncoder.tex',
+     u'TransformerEncoder Documentation',
      u"Dustin Klebe, Jie-Ming Li, Lukas Wolf ", 'manual'),
 ]
 
@@ -215,7 +215,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'DETRtime', u'DETRtime Documentation',
+    ('index', 'TransformerEncoder', u'TransformerEncoder Documentation',
      [u"Dustin Klebe, Jie-Ming Li, Lukas Wolf "], 1)
 ]
 
@@ -229,8 +229,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'DETRtime', u'DETRtime Documentation',
-     u"Dustin Klebe, Jie-Ming Li, Lukas Wolf ", 'DETRtime',
+    ('index', 'TransformerEncoder', u'TransformerEncoder Documentation',
+     u"Dustin Klebe, Jie-Ming Li, Lukas Wolf ", 'TransformerEncoder',
      'The last segmentation solution. ', 'Miscellaneous'),
 ]
 
