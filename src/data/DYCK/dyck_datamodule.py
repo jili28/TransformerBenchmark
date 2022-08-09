@@ -20,38 +20,42 @@ class DYCK_Dataset(Dataset):
     while theoretically an iterable dataset, abusing Dataset API
     works out to smoother implementation
     """
-    def __init__(self, word_length, len, leq = True):
+    def __init__(self, word_length, len, k, M, leq = True):
         super(DYCK_Dataset, self).__init__()
         assert word_length > 0
         self.word_length = word_length
         self.leq = leq
-        self.len = len
-        self.dyck = np.load('dyck_512.npy',allow_pickle='TRUE').item()
+        self.len = len #pre-generated until length 512(*2)
+        self.k = k #recursion bound <= 15
+        self.M = M #bracket types
+        self.dyck = np.load("dyck_{}_{}.npy".format(k,M),allow_pickle='TRUE')
 
     def __len__(self):
         return self.len
 
     def __getitem__(self, idx):
         if self.leq:
-            word_length = np.random.randint(1, self.word_length)
+            word_length = np.random.randint(1, self.word_length+1)
         else:
             word_length = self.word_length
         
         is_dyck = np.random.randint(2)
         
         if is_dyck:
-            word = np.random.choice(self.dyck[word_length])
+            depth = np.random.randint(1, min(self.k, word_length)+1)
+            word = np.random.choice(self.dyck[word_length][depth])
             word = [int(x) for x in word]
         else: 
             word = np.random.randint(2, size=(int(2*word_length)))
-            is_dyck = ("".join(str(x) for x in word)) in self.dyck[word_length] #sanity check
+
+            #is_dyck = ("".join(str(x) for x in word)) in self.dyck[word_length] #sanity check
 
         return torch.tensor(word), is_dyck
 
         
 
 class DYCK_DataModule(pl.LightningDataModule):
-    def __init__(self, word_length, leq, len, batch_size=32, collate_fn=None):
+    def __init__(self, word_length, leq, len, k, M, batch_size=32, collate_fn=None):
         super().__init__()
         self.batch_size = batch_size
         self.transform = None  # define dataset specific transforms here
@@ -59,6 +63,8 @@ class DYCK_DataModule(pl.LightningDataModule):
         self.word_length = word_length
         self.leq = leq
         self.len = len
+        self.k = k #recursion bound <= 15
+        self.M = M #bracket types
 
 
     def prepare_data(self):
@@ -78,11 +84,11 @@ class DYCK_DataModule(pl.LightningDataModule):
 
         # Assign train/val datasets for use in dataloaders
         if stage == "fit" or stage is None:
-            self.train_set = DYCK_Dataset(word_length=self.word_length, len=self.len, leq=True)
+            self.train_set = DYCK_Dataset(word_length=self.word_length, len=self.len, k=self.k, M=self.M, leq=True)
             self.val_set = DYCK_Dataset(word_length=self.word_length, len=self.len, leq=False)
 
         if stage == "test" or stage is None:
-            self.test_set = DYCK_Dataset(word_length=self.word_length, len=self.len, leq=False)
+            self.test_set = DYCK_Dataset(word_length=self.word_length, len=self.len, k=self.k, M=self.M, leq=False)
 
         if stage == "predict" or stage is None:
             self.predict_set = NotImplemented

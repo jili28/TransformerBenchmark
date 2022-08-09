@@ -35,7 +35,9 @@ params = {
         'word_length':512,
         'len':10000,
         'leq':True,
-        'batch_size':64
+        'batch_size':64,
+        'k': 10,
+        'M': 1
 
     },
     'Encoder': {

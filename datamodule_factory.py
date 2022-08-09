@@ -30,6 +30,8 @@ def get_datamodule():
             word_length=params[config['model']]['word_length'],
             len = params[config['model']]['len'],
             leq = params[config['model']]['leq'],
+            k = params[config['model']]['k'],
+            M = params[config['model']]['M'],
             batch_size=params[config['model']]['batch_size']
             )
     else:
