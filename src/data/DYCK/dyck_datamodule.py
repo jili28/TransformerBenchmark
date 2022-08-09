@@ -28,14 +28,16 @@ class DYCK_Dataset(Dataset):
         self.len = len #pre-generated until length 512(*2)
         self.k = k #recursion bound <= 15
         self.M = M #bracket types
-        self.dyck = np.load("dyck_{}_{}.npy".format(k,M),allow_pickle='TRUE')
+        self.dyck = np.load("dyck_15_{}.npy".format(M),allow_pickle='TRUE')
 
     def __len__(self):
         return self.len
 
     def __getitem__(self, idx):
+        mask = torch.zeros((int(2*self.word_length)))
         if self.leq:
             word_length = np.random.randint(1, self.word_length+1)
+            mask[2*word_length:] = 1
         else:
             word_length = self.word_length
         
@@ -48,7 +50,7 @@ class DYCK_Dataset(Dataset):
         else: 
             word = np.random.randint(2, size=(int(2*word_length)))
 
-            #is_dyck = ("".join(str(x) for x in word)) in self.dyck[word_length] #sanity check
+        word = np.pad(word, (0, 2*(self.word_length - word_length)), mode="constant")
 
         return torch.tensor(word), is_dyck
 
