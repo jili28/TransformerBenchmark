@@ -40,19 +40,19 @@ params = {
     },
     'Encoder': {
         'lr': 1e-4,
-        'epochs': 200,
+        'epochs': 50,
         #model
         'layers' : 2,
         'heads' : 1,
         'd_model': 16,
-        'd_ffnn': 64,
+        'd_ffnn': 32,
         'scaled': True,
         'eps': 1e-5,
         #data
-        'word_length':512,
-        'len':10000,
+        'word_length':1500,
+        'len':32,
         'leq':True,
-        'batch_size':64
+        'batch_size':32
 
     },
 }

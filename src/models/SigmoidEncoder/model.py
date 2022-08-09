@@ -89,9 +89,9 @@ class Encoder(pl.LightningModule):
         #     else:
         #         self.log(f'{i}', log_object)
 
-        self.log("Validation Accuracy", accuracy)
+        self.log("Validation Accuracy", float(accuracy), prog_bar=True)
         logging.info(f'classification_report:\n {report}')
-        print(f'classification_report:\n {report}')
+        #print(f'classification_report:\n {report}')
 
     def test_step(self, batch, barch_idx):
         x, mask, y = batch
@@ -133,9 +133,9 @@ class Encoder(pl.LightningModule):
         #             self.log(f'{i}_{k}', log_object[k])
         #     else:
         #         self.log(f'{i}', log_object)
-        self.log("Test Accuracy", accuracy)
+        self.log("Test Accuracy", float(accuracy), prog_bar=True)
         logging.info(f'classification_report:\n {report}')
-        print(f'classification_report:\n {report}')
+        #print(f'classification_report:\n {report}')
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=0.02)

@@ -5,6 +5,7 @@ from config import config
 from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.callbacks import RichProgressBar, TQDMProgressBar
 from pytorch_lightning.loggers import WandbLogger
 from src.utils.model_factory import get_model
 from src.models.hyperparameters import params
@@ -52,8 +53,8 @@ def main():
     #                            )
     trainer = pl.Trainer(accelerator="gpu",  # cpu or gpu
                          devices=-1,  # -1: use all available gpus, for cpu e.g. 4
-                         enable_progress_bar=False,  # disable progress bar
-                         # progress_bar_refresh_rate=500, # show progress bar every 500 iterations
+                         enable_progress_bar=True,  # disable progress bar
+                         # show progress bar every 500 iterations
                          # precision=16, # 16 bit float precision for training
                          #logger=[tb_logger, wandb_logger],  # log to tensorboard and wandb
                          logger = [tb_logger],
@@ -61,7 +62,8 @@ def main():
                          max_epochs=params[config['model']]['epochs'],  # max number of epochs
                          callbacks=[EarlyStopping(monitor="Validation Loss", patience=20),  # early stopping
                                     ModelSummary(max_depth=1),  # model summary
-                                    ModelCheckpoint(log_dir, monitor='Validation Loss', save_top_k=1)  # save best model
+                                    ModelCheckpoint(log_dir, monitor='Validation Loss', save_top_k=1),  # save best model
+                                    #TQDMProgressBar(10)
                                     ],
                          auto_lr_find=True  # automatically find learning rate
                          )
