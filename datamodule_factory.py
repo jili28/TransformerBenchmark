@@ -26,10 +26,13 @@ def get_datamodule():
             batch_size=params[config['model']]['batch_size']
             )
     elif config['dataset'] == 'dyck':
+        print(params[config['model']]['word_length'])
         return DYCK_DataModule(
             word_length=params[config['model']]['word_length'],
             len = params[config['model']]['len'],
             leq = params[config['model']]['leq'],
+            k = params[config['model']]['k'],
+            M = params[config['model']]['M'],
             batch_size=params[config['model']]['batch_size']
             )
     else:

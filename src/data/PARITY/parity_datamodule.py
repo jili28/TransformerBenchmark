@@ -31,12 +31,17 @@ class PARITY_Dataset(Dataset):
         return self.len
 
     def __getitem__(self, idx):
+        mask = torch.zeros((int(self.word_length)))
         if self.leq:
             word_length = np.random.randint(1, self.word_length)
+            mask[word_length:] = 1
         else:
             word_length = self.word_length
+
         word = np.random.randint(2, size=(int(word_length)))
         sum = np.sum(word)
+        word = np.pad(word, (0, self.word_length - word_length), mode="constant")
+
         return torch.tensor(word), (sum % 2 != 0)
 
 class PARITY_DataModule(pl.LightningDataModule):

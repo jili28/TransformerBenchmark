@@ -35,7 +35,9 @@ params = {
         'word_length':512,
         'len':10000,
         'leq':True,
-        'batch_size':64
+        'batch_size':64,
+        'k': 10,
+        'M': 1
 
     },
     'Encoder': {
@@ -54,5 +56,23 @@ params = {
         'leq':True,
         'batch_size':32
 
+    },
+
+    'CausalEncoder': {
+        'lr': 1e-4,
+        'epochs': 50,
+        #model
+        'num_heads' : 2,
+        'input_size' : 0,
+        'hidden_size' : 32,
+        'num_layers' : 3,
+        'M' : 1,
+        'embedding_type' : "pw",
+        #data
+        'word_length': 64,
+        'len':10000,
+        'leq':True,
+        'batch_size':32,
+        'k' : 1
     },
 }

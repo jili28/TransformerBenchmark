@@ -13,7 +13,7 @@ config['mode'] = 'train'  # 'train' or 'eval'
 """
 Data related settings 
 """
-config['dataset'] = 'first'  # options: sleep-edf-153, ...
+config['dataset'] = 'dyck'  # options: sleep-edf-153, ...
 # load input size from json file of the dataset 
 # with open(f"data/processed/{config['dataset']}/info.json") as f:
 #     data = json.load(f)
@@ -25,7 +25,8 @@ Model related settings
 Available models: Acceptor
 """
 #config['model'] = 'Acceptor'
-config['model'] = 'Encoder'
+# config['model'] = "Encoder"
+config['model'] = 'CausalEncoder'
 """
 Training related settings
 """
