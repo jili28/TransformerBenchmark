@@ -71,7 +71,6 @@ params = {
         #data
         'word_length': 512,
         'len':10000,
-        'test_len': 10000,
         'leq':True,
         'batch_size':32,
         'k' : 1
