@@ -69,7 +69,7 @@ params = {
         'M' : 1,
         'embedding_type' : "pw",
         #data
-        'word_length': 512,
+        'word_length': 256,
         'len':10000,
         'test_len': 10000,
         'leq':True,

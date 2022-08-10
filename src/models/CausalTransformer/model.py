@@ -156,15 +156,15 @@ class TransformerModel(pl.LightningModule):
         y_hat, y_true = zip(*outputs)
         y_true = np.concatenate(y_true).flatten()
         y_hat = np.concatenate(y_hat).flatten()
-        self.log("Num True", float(np.sum(y_true)))
+        self.log("# positive Val example", float(np.sum(y_true)))
         report = classification_report(y_true, y_hat, digits=4, output_dict=True)
         for i in report.keys():
             log_object = report[i]
             if isinstance(log_object, dict):
                 for k in log_object.keys():
-                    self.log(f'{i}_{k}', log_object[k])
+                    self.log(f'Validation_{i}_{k}', log_object[k])
             else:
-                self.log(f'{i}', log_object)
+                self.log(f'Validation_{i}', log_object)
         logging.info(f'classification_report:\n {report}')
 
     def test_step(self, batch, barch_idx):
@@ -183,15 +183,15 @@ class TransformerModel(pl.LightningModule):
         y_hat, y_true = zip(*outputs)
         y_true = np.concatenate(y_true).flatten()
         y_hat = np.hstack(y_hat).flatten()
-        self.log("Num True", float(np.sum(y_true)))
+        self.log("# positive test examples", float(np.sum(y_true)))
         report = classification_report(y_true, y_hat, digits=4, output_dict=True)
         for i in report.keys():
             log_object = report[i]
             if isinstance(log_object, dict):
                 for k in log_object.keys():
-                    self.log(f'{i}_{k}', log_object[k])
+                    self.log(f'Test_{i}_{k}', log_object[k])
             else:
-                self.log(f'{i}', log_object)
+                self.log(f'Test_{i}', log_object)
         logging.info(f'classification_report:\n {report}')
 
     def configure_optimizers(self):
