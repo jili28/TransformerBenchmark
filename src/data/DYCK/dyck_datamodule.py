@@ -4,6 +4,8 @@ from typing import Optional
 import numpy as np
 import pytorch_lightning as pl
 import torch
+from typing import Tuple, List
+from tqdm import tqdm
 from torch.utils.data import DataLoader, Dataset, IterableDataset
 from itertools import product
 
@@ -16,7 +18,7 @@ def collate_tuples(batch):
     return tuple(batch)
 
 
-file_path = '/home/jimmy/TransformerBenchmark/data/raw/dyck_files/dyck_15_{}.npy'
+file_path = './dyck_files/dyck_15_{}.npy'
 
 
 class DYCK_Dataset(Dataset):
@@ -25,9 +27,9 @@ class DYCK_Dataset(Dataset):
     works out to smoother implementation
     """
 
-    def __init__(self, word_length, len, k, M, leq=True, invert_mask = True):
-
+    def __init__(self, word_length, len, k, M, leq=True, invert_mask=True):
         super(DYCK_Dataset, self).__init__()
+
         assert word_length > 0
         assert word_length % 2 == 0
         print(f'Word Length {word_length}')
@@ -39,11 +41,12 @@ class DYCK_Dataset(Dataset):
         self.vocab_size = 2 * k
         self.invert_mask = invert_mask
         self.dyck = np.load(file_path.format(M), allow_pickle=True)
+        print("Loaded")
 
     def __len__(self):
         return self.len
 
-    def __getitem__(self, idx):
+    def generate_random_word(self):
         # mask = torch.zeros((int(2 * self.word_length)))
         if self.leq:
             word_length = np.random.randint(1, self.word_length + 1)
@@ -65,14 +68,37 @@ class DYCK_Dataset(Dataset):
         if is_dyck:
             depth = np.random.randint(1, min(self.k, word_length) + 1)
             word = np.random.choice(self.dyck[word_length][depth])
-            word = [int(x) for x in word]
+            word = np.array([int(x) for x in word])
         else:
             word = np.random.randint(0, high=self.vocab_size, size=(int(2 * word_length)))
 
-        word = np.pad(word, (0, 2 * (self.word_length - word_length)), mode="constant")
-        # print(len(word))
-        # print(2*word_length)
-        return torch.tensor(word), mask, 2 * word_length, is_dyck
+        return word, mask, word_length, is_dyck
+
+    def pad_word(self, word, length, mode="constant"):
+        return np.pad(word, (0, 2 * (self.word_length - length)), mode=mode)
+
+    def unique_generator(self):
+        seen_words = set()
+
+        while True:
+            word, mask, length, is_dyck = self.generate_random_word()
+
+            flat = "".join(str(x) for x in word.flatten())  # this is reasonable since we're using bit-strings
+            if flat in seen_words:
+                continue
+            else:
+                seen_words.add(flat)
+
+            word = self.pad_word(word, length)
+            yield torch.tensor(word), mask, 2 * length, is_dyck
+
+    def __getitem__(self, idx):
+        # generate a word
+        word, mask, length, is_dyck = self.generate_random_word()
+
+        # pad the word
+        word = self.pad_word(word, length)
+        return torch.tensor(word), mask, 2 * length, is_dyck
 
 
 class DYCK_DataModule(pl.LightningDataModule):
@@ -81,7 +107,7 @@ class DYCK_DataModule(pl.LightningDataModule):
         self.batch_size = batch_size
         self.transform = None  # define dataset specific transforms here
         self.collate_fn = collate_fn
-        #assert word_length % 2 == 0
+        # assert word_length % 2 == 0
         self.word_length = word_length
         self.leq = leq
         self.len = len
