@@ -63,7 +63,7 @@ def main():
                          # show progress bar every 500 iterations
                          # precision=16, # 16 bit float precision for training
                          logger=[tb_logger, wandb_logger],  # log to tensorboard and wandb
-                         # logger = [tb_logger],
+                         #logger = [tb_logger],
 
                          max_epochs=params[config['model']]['epochs'],  # max number of epochs
                          callbacks=[EarlyStopping(monitor="Validation Loss", patience=3),  # early stopping

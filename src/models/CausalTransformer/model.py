@@ -85,6 +85,7 @@ class TransformerModel(pl.LightningModule):
             nn.Sigmoid()
         )
         self.loss = nn.BCELoss()
+        self.save_hyperparameters()
 
     def forward(self, batch, mask, lengths):
         """ Computes the forward pass to construct prefix representations.

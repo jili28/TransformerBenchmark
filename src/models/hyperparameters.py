@@ -64,7 +64,7 @@ params = {
         #model
         'num_heads' : 4,
         'input_size' : 0,
-        'hidden_size' : 32,
+        'hidden_size' : 128,
         'num_layers' : 3,
         'M' : 1,
         'embedding_type' : "pw",
@@ -74,6 +74,6 @@ params = {
         'test_len': 10000,
         'leq':True,
         'batch_size':32,
-        'k' : 1
+        'k' : 5
     },
 }

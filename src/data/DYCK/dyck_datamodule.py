@@ -36,7 +36,7 @@ class DYCK_Dataset(Dataset):
         self.len = len  # pre-generated until length 512(*2)
         self.k = k  # recursion bound <= 15
         self.M = M  # bracket types
-        self.vocab_size = 2 * k
+        self.vocab_size = 2 * M
         self.invert_mask = invert_mask
         self.dyck = np.load(file_path.format(M), allow_pickle=True)
 
