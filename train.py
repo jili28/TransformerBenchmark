@@ -46,21 +46,21 @@ def main():
                                   name=f"{run_id}_{config['model']}"
                                   )
     tb_logger.log_hyperparams(params[config['model']])  # log hyperparameters
-    # wandb_logger = WandbLogger(project=f"{config['dataset']}",
-    #                            entity="deepseg",
-    #                            save_dir=f"reports/logs/{run_id}_{config['model']}",
-    #                            id=f"{run_id}_{config['model']}"
-    #                            )
+    wandb_logger = WandbLogger(project=f"{config['project']}",
+                               entity=config['entity'],
+                               save_dir=f"reports/logs/{run_id}_{config['model']}",
+                               id=f"{run_id}_{config['model']}"
+                               )
     trainer = pl.Trainer(accelerator="gpu",  # cpu or gpu
                          devices=-1,  # -1: use all available gpus, for cpu e.g. 4
                          enable_progress_bar=True,  # disable progress bar
                          # show progress bar every 500 iterations
                          # precision=16, # 16 bit float precision for training
-                         #logger=[tb_logger, wandb_logger],  # log to tensorboard and wandb
-                         logger = [tb_logger],
+                         logger=[tb_logger, wandb_logger],  # log to tensorboard and wandb
+                         #logger = [tb_logger],
 
                          max_epochs=params[config['model']]['epochs'],  # max number of epochs
-                         callbacks=[EarlyStopping(monitor="Validation Loss", patience=20),  # early stopping
+                         callbacks=[EarlyStopping(monitor="Validation Loss", patience=3),  # early stopping
                                     ModelSummary(max_depth=1),  # model summary
                                     ModelCheckpoint(log_dir, monitor='Validation Loss', save_top_k=1),  # save best model
                                     #TQDMProgressBar(10)

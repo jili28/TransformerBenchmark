@@ -86,7 +86,7 @@ class TransformerModel(pl.LightningModule):
         )
         self.loss = nn.BCELoss()
 
-    def forward(self, batch, mask):
+    def forward(self, batch, mask, lengths):
         """ Computes the forward pass to construct prefix representations.
         Arguments:
           batch: (batch_len, seq_len) vectors representing
@@ -110,15 +110,24 @@ class TransformerModel(pl.LightningModule):
                 vec3 = self.embedding_e(batch)
                 vec = torch.cat((vec1, vec2, vec3), -1).float()
             last_hidden, _ = self.model.forward(inputs_embeds=vec, attention_mask=mask).values()
+            batch = []
+            #print(last_hidden.size())
+            for i in range(len(last_hidden)):
+                t = torch.mean(last_hidden[i][:lengths[i]], dim=0)
+                #print(t.size())
+                batch.append(t)
+
+            last_hidden = torch.stack(batch)
+            #print(last_hidden.size())
             return self.final_layer(last_hidden)
 
     def training_step(self, batch, batch_idx):
         x, mask, lengths, y = batch
-        y_pred = self.forward(x, mask)
+        y_pred = self.forward(x, mask, lengths)
         # print(y_pred.size())
         # print(lengths.size())
 
-        y_pred = y_pred[torch.arange(0, len(x)), (lengths-1)]
+        #y_pred = y_pred[torch.arange(0, len(x)), (lengths-1)]
         y_pred = y_pred.squeeze()
         loss = self.loss(y_pred, y.float())
         self.log("Training Loss", loss)
@@ -128,25 +137,26 @@ class TransformerModel(pl.LightningModule):
 
         # run through criterion
         x, mask, lengths, y = batch
-        y_pred = self.forward(x, mask)
+        y_pred = self.forward(x, mask, lengths)
         y_pred = y_pred.squeeze()
         # print(y_pred.size())
         # print(max(lengths.size()))
-        y_pred = y_pred[torch.arange(0, len(x)), lengths-1]
+        #y_pred = y_pred[torch.arange(0, len(x)), lengths-1]
         y_pred = y_pred.squeeze()
         # print(y_pred.size())
         # print(y.size())
         loss = self.loss(y_pred, y.float())
         self.log("Validation Loss", loss)
-        return np.array(y_pred.long().cpu().flatten()), np.array(y.cpu().flatten())
+        return np.array(torch.round(y_pred).cpu().flatten()), np.array(y.cpu().flatten())
 
     def validation_epoch_end(self, outputs) -> None:
         """
         Called at the end of validation.
         """
-        y_true, y_hat = zip(*outputs)
+        y_hat, y_true = zip(*outputs)
         y_true = np.concatenate(y_true).flatten()
         y_hat = np.concatenate(y_hat).flatten()
+        self.log("Num True", float(np.sum(y_true)))
         report = classification_report(y_true, y_hat, digits=4, output_dict=True)
         for i in report.keys():
             log_object = report[i]
@@ -159,20 +169,21 @@ class TransformerModel(pl.LightningModule):
 
     def test_step(self, batch, barch_idx):
         x, mask, lengths, y = batch
-        y_pred = self.forward(x, mask)
-        y_pred = y_pred[torch.arange(0, len(x)), lengths-1]
+        y_pred = self.forward(x, mask, lengths)
+        #y_pred = y_pred[torch.arange(0, len(x)), lengths-1]
         y_pred = y_pred.squeeze()
         loss = self.loss(y_pred, y.float())
         self.log("Test Loss", loss)
-        return np.array(y_pred.long().cpu().flatten()), np.array(y.cpu().flatten())
+        return np.array(torch.round(y_pred).cpu().flatten()), np.array(y.cpu().flatten())
 
     def test_epoch_end(self, outputs) -> None:
         """
         Called at the end of testing.
         """
-        y_true, y_hat = zip(*outputs)
+        y_hat, y_true = zip(*outputs)
         y_true = np.concatenate(y_true).flatten()
-        y_hat = np.concatenate(y_hat).flatten()
+        y_hat = np.hstack(y_hat).flatten()
+        self.log("Num True", float(np.sum(y_true)))
         report = classification_report(y_true, y_hat, digits=4, output_dict=True)
         for i in report.keys():
             log_object = report[i]
@@ -184,7 +195,7 @@ class TransformerModel(pl.LightningModule):
         logging.info(f'classification_report:\n {report}')
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=0.02)
+        return torch.optim.AdamW(self.parameters(), lr=0.001)
 
 
 def build_causal_encoder(args):

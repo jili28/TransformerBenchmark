@@ -27,6 +27,9 @@ Available models: Acceptor
 #config['model'] = 'Acceptor'
 # config['model'] = "Encoder"
 config['model'] = 'CausalEncoder'
+
+config['project'] = "Transformer-Benchmark"
+config['entity'] = "jili"
 """
 Training related settings
 """
