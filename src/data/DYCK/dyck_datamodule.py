@@ -60,8 +60,8 @@ class DYCK_Dataset(Dataset):
             mask = torch.zeros((int(2 * self.word_length)))
             mask[2 * word_length:] = 1
 
-        is_dyck = np.random.randint(2)
-
+        is_dyck = np.random.randint(low=0, high=6)
+        is_dyck = is_dyck < 1
         if is_dyck:
             depth = np.random.randint(1, min(self.k, word_length) + 1)
             word = np.random.choice(self.dyck[word_length][depth])
@@ -106,10 +106,10 @@ class DYCK_DataModule(pl.LightningDataModule):
         # Assign train/val datasets for use in dataloaders
         if stage == "fit" or stage is None:
             self.train_set = DYCK_Dataset(word_length=self.word_length, len=self.len, k=self.k, M=self.M, leq=True)
-            self.val_set = DYCK_Dataset(word_length=self.word_length, len=self.len, k=self.k, M=self.M, leq=False)
+            self.val_set = DYCK_Dataset(word_length=self.word_length, len=self.len//10, k=self.k, M=self.M, leq=True)
 
         if stage == "test" or stage is None:
-            self.test_set = DYCK_Dataset(word_length=self.word_length, len=self.len, k=self.k, M=self.M, leq=False)
+            self.test_set = DYCK_Dataset(word_length=self.word_length, len=self.len//10, k=self.k, M=self.M, leq=True)
 
         if stage == "predict" or stage is None:
             self.predict_set = NotImplemented
