@@ -19,7 +19,9 @@ import logging
 def main():
     # Create model directory and Logger
     run_id = time.strftime("%Y%m%d-%H%M%S")
-    log_dir = f"reports/logs/{run_id}_{config['model']}"
+    log_dir = \
+        f"reports/logs/{run_id}_{config['model']}_" \
+        f"{config['dataset']}_{params[config['model']]['word_length']}"
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     sys.stdout = Logger(print_fp=os.path.join(log_dir, 'out.txt'))
@@ -48,9 +50,13 @@ def main():
     tb_logger.log_hyperparams(params[config['model']])  # log hyperparameters
     wandb_logger = WandbLogger(project=f"{config['project']}",
                                entity=config['entity'],
-                               save_dir=f"reports/logs/{run_id}_{config['model']}",
-                               id=f"{run_id}_{config['model']}"
+                               save_dir=f"reports/logs/{run_id}_{config['model']}_" \
+                                        f"{config['dataset']}_{params[config['model']]['word_length']}",
+                               id=f"{run_id}_{config['model']}_" \
+                                  f"{config['dataset']}_{params[config['model']]['word_length']}"
                                )
+    wandb_logger.experiment.config["Model"] = config['model']
+    wandb_logger.experiment.config.update(params[config['model']])
     trainer = pl.Trainer(accelerator="gpu",  # cpu or gpu
                          devices=-1,  # -1: use all available gpus, for cpu e.g. 4
                          enable_progress_bar=True,  # disable progress bar
@@ -62,8 +68,9 @@ def main():
                          max_epochs=params[config['model']]['epochs'],  # max number of epochs
                          callbacks=[EarlyStopping(monitor="Validation Loss", patience=3),  # early stopping
                                     ModelSummary(max_depth=1),  # model summary
-                                    ModelCheckpoint(log_dir, monitor='Validation Loss', save_top_k=1),  # save best model
-                                    #TQDMProgressBar(10)
+                                    ModelCheckpoint(log_dir, monitor='Validation Loss', save_top_k=1),
+                                    # save best model
+                                    # TQDMProgressBar(10)
                                     ],
                          auto_lr_find=True  # automatically find learning rate
                          )

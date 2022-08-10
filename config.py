@@ -29,7 +29,7 @@ Available models: Acceptor
 config['model'] = 'CausalEncoder'
 
 config['project'] = "Transformer-Benchmark"
-config['entity'] = "jili"
+config['entity'] = "dyck-benchmark"
 """
 Training related settings
 """
