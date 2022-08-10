@@ -18,7 +18,7 @@ def collate_tuples(batch):
     return tuple(batch)
 
 
-file_path = './dyck_files/dyck_15_{}.npy'
+file_path = '/home/jimmy/TransformerBenchmark/data/raw/dyck_files/dyck_15_{}.npy'
 
 
 class DYCK_Dataset(Dataset):
@@ -142,13 +142,13 @@ class DYCK_DataModule(pl.LightningDataModule):
             self.predict_set = NotImplemented
 
     def train_dataloader(self):
-        return DataLoader(self.train_set, batch_size=self.batch_size, collate_fn=self.collate_fn, shuffle=True)
+        return DataLoader(self.train_set, batch_size=self.batch_size, collate_fn=self.collate_fn, shuffle=True, num_workers=5)
 
     def val_dataloader(self):
-        return DataLoader(self.val_set, batch_size=self.batch_size, collate_fn=self.collate_fn)
+        return DataLoader(self.val_set, batch_size=self.batch_size, collate_fn=self.collate_fn, num_workers=2)
 
     def test_dataloader(self):
-        return DataLoader(self.test_set, batch_size=self.batch_size, collate_fn=self.collate_fn)
+        return DataLoader(self.test_set, batch_size=self.batch_size, collate_fn=self.collate_fn, num_workers=2)
 
     def predict_dataloader(self):
         raise NotImplementedError("We do not have a predict set in this datamodule")
