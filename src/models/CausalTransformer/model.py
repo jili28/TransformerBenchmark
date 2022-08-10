@@ -181,8 +181,6 @@ class TransformerModel(pl.LightningModule):
         Called at the end of testing.
         """
         y_hat, y_true = zip(*outputs)
-        print(y_hat)
-        print(y_true)
         y_true = np.concatenate(y_true).flatten()
         y_hat = np.hstack(y_hat).flatten()
         self.log("Num True", float(np.sum(y_true)))
@@ -197,7 +195,7 @@ class TransformerModel(pl.LightningModule):
         logging.info(f'classification_report:\n {report}')
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=0.001)
+        return torch.optim.AdamW(self.parameters(), lr=0.001)
 
 
 def build_causal_encoder(args):

@@ -76,7 +76,7 @@ class DYCK_Dataset(Dataset):
 
 
 class DYCK_DataModule(pl.LightningDataModule):
-    def __init__(self, word_length, leq, len, k, M, batch_size=32, collate_fn=None):
+    def __init__(self, word_length, leq, len, test_len, k, M, batch_size=32, collate_fn=None):
         super().__init__()
         self.batch_size = batch_size
         self.transform = None  # define dataset specific transforms here
@@ -85,6 +85,7 @@ class DYCK_DataModule(pl.LightningDataModule):
         self.word_length = word_length
         self.leq = leq
         self.len = len
+        self.test_len = test_len
         self.k = k  # recursion bound <= 15
         self.M = M  # bracket types
 
@@ -106,10 +107,10 @@ class DYCK_DataModule(pl.LightningDataModule):
         # Assign train/val datasets for use in dataloaders
         if stage == "fit" or stage is None:
             self.train_set = DYCK_Dataset(word_length=self.word_length, len=self.len, k=self.k, M=self.M, leq=True)
-            self.val_set = DYCK_Dataset(word_length=self.word_length, len=self.len//10, k=self.k, M=self.M, leq=True)
+            self.val_set = DYCK_Dataset(word_length=self.word_length, len=self.len//2, k=self.k, M=self.M, leq=True)
 
         if stage == "test" or stage is None:
-            self.test_set = DYCK_Dataset(word_length=self.word_length, len=self.len//10, k=self.k, M=self.M, leq=True)
+            self.test_set = DYCK_Dataset(word_length=self.word_length, len=self.test_len, k=self.k, M=self.M, leq=True)
 
         if stage == "predict" or stage is None:
             self.predict_set = NotImplemented
