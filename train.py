@@ -1,3 +1,5 @@
+import wandb
+import yaml
 import sys
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelSummary
@@ -8,7 +10,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.callbacks import RichProgressBar, TQDMProgressBar
 from pytorch_lightning.loggers import WandbLogger
 from src.utils.model_factory import get_model
-from src.models.hyperparameters import params
+from src.models.hyperparameters import params as default_params
 import time
 from src.utils.logger import Logger, log_params, WandbImageLogger
 import os
@@ -17,6 +19,10 @@ import logging
 
 
 def main():
+
+    wandb.init(config=default_params)
+    params = wandb.config
+
     # Create model directory and Logger
     run_id = time.strftime("%Y%m%d-%H%M%S")
     log_dir = \
@@ -85,4 +91,10 @@ def main():
 
 
 if __name__ == "__main__":
+    #load sweep files
+    with open('sweep.yaml') as f:
+        sweep_params = yaml.load(f, Loader=yaml.FullLoader)
+    sweep_id = wandb.sweep(sweep_params)
+    wandb.agent(sweep_id, function=main)
+
     main()
