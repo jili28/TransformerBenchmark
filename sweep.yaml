@@ -4,19 +4,12 @@ metric:
   goal: minimize
   name: val_loss
 parameters:
-#  Acceptor:
-#    lr: [1e-4, 1e-5, 1e-8]
-#    hidden_dim: [32, 64, 128]
-#  Encoder:
-#    lr: [1e-4, 1e-5, 1e-8]
-#    layers: [2, 4, 8]
-#    heads: [1, 2, 4]
       model:
         values: ['CausalEncoder']
       lr:
         values: [1e-3]
       num_heads:
-        values: [1, 4]
+        values: [4]
       hidden_size:
         values: [16, 32, 64]
       num_layers:
@@ -28,7 +21,6 @@ parameters:
         values: [0]
       embedding_type:
         values: ["pw"]
-        #data
       word_length:
         values: [256, 512, 1024]
       len:
@@ -38,7 +30,7 @@ parameters:
       batch_size:
         values: [32]
       M:
-        values: [1]
+        values: [1, 2, 5]
       k:
         values: [1, 5, 15]
 early_terminate:
