@@ -11,14 +11,14 @@ import math
 import pytorch_lightning as pl
 import utils
 from transformers import GPT2Config, GPT2Model
-
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 MAX_LEN = 1024
 P_DROP = 0
 
 
 class TransformerModel(pl.LightningModule):
     def __init__(self, num_heads, input_size, hidden_size, num_layers, vocab_size=5,
-                 bracket_num=10, embedding_type='pw'):
+                 bracket_num=10, lr=1e-3, embedding_type='pw'):
         super(TransformerModel, self).__init__()
         # self.input_size = input_size  # dimensionality of initial embeddings
         input_size = hidden_size
@@ -85,6 +85,7 @@ class TransformerModel(pl.LightningModule):
             nn.Sigmoid()
         )
         self.loss = nn.BCELoss()
+        self.lr = lr
         self.save_hyperparameters()
 
     def forward(self, batch, mask, lengths):
@@ -196,8 +197,17 @@ class TransformerModel(pl.LightningModule):
         logging.info(f'classification_report:\n {report}')
 
     def configure_optimizers(self):
-        return torch.optim.AdamW(self.parameters(), lr=0.001)
-
+        optimizer =  torch.optim.AdamW(self.parameters(), lr=self.lr)
+        return {
+            "optimizer": optimizer,
+            "lr_scheduler": {
+                "scheduler": ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=0),
+                "monitor": "Training Loss",
+                "frequency": 2
+                # If "monitor" references validation metrics, then "frequency" should be set to a
+                # multiple of "trainer.check_val_every_n_epoch".
+            },
+        }
 
 def build_causal_encoder(args):
     # device = torch.device(args["device"])
@@ -205,6 +215,6 @@ def build_causal_encoder(args):
         num_heads=args['num_heads'], input_size=args['input_size'],
         hidden_size=args['hidden_size'], num_layers=args['num_layers'],
         vocab_size=args['M'] *2,
-        bracket_num=args['M'], embedding_type=args['embedding_type'])
+        bracket_num=args['M'], lr=args['lr'], embedding_type=args['embedding_type'])
 
     return model

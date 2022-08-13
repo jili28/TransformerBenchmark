@@ -38,6 +38,35 @@ def get_datamodule():
     else:
         raise NotImplementedError("Choose valid dataset in config.py")
 
+def get_datamodule_sweep(params):
+    if config['dataset'] == 'first':
+        return FIRST_DataModule(
+            word_length=params['word_length'],
+            len = params['len'],
+            leq = params['leq'],
+            batch_size=params['batch_size']
+            )
+    elif config['dataset'] == 'parity':
+        return PARITY_DataModule(
+            word_length=params['word_length'],
+            len = params['len'],
+            leq = params['leq'],
+            batch_size=params['batch_size']
+            )
+    elif config['dataset'] == 'dyck':
+        print(params['word_length'])
+        return DYCK_DataModule(
+            word_length=params['word_length'],
+            len = params['len'],
+            leq = params['leq'],
+            k = params['k'],
+            M = params['M'],
+            batch_size=params['batch_size']
+            )
+    else:
+        raise NotImplementedError("Choose valid dataset in config.py")
+
+
 
 if __name__ == '__main__':
     print(f"Loading data")

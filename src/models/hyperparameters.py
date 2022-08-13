@@ -64,16 +64,16 @@ params = {
         #model
         'num_heads' : 4,
         'input_size' : 0,
-        'hidden_size' : 48,
+        'hidden_size' : 16,
         'num_layers' : 3,
 
         'embedding_type' : "pw",
         #data
-        'word_length': 512,
-        'len':10000,
+        'word_length': 1024,
+        'len':20000,
         'leq':True,
         'batch_size':32,
-        'M' : 2,
-        'k' : 5
+        'M' : 5,
+        'k' : 15
     },
 }
