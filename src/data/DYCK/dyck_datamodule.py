@@ -20,7 +20,7 @@ def collate_tuples(batch):
     return tuple(batch)
 
 
-file_path = '/home/jimmy/TransformerBenchmark/data/raw/dyck_files/dyck_15_{}.npy'
+file_path = 'data/raw/dyck_files/dyck_15_{}.npy'
 
 
 class DYCK_GeneratorDataset(Dataset):
